@@ -18,6 +18,10 @@ public class RecetteActivity extends AppCompatActivity {
 
     EditText titreInput, descriptionInput;
     Button ajouterBtn, supprimerBtn, logoutBtn;  // Declare Log Out button
+    Button partagerBtn;
+    EditText searchInput;
+
+
     ListView recetteListView;
     RecetteDAO recetteDAO;
     ArrayList<Recette> recettes;
@@ -35,7 +39,8 @@ public class RecetteActivity extends AppCompatActivity {
         supprimerBtn = findViewById(R.id.supprimerBtn);
         logoutBtn = findViewById(R.id.logoutBtn);  // Initialize Log Out button
         recetteListView = findViewById(R.id.recetteListView);
-
+        partagerBtn = findViewById(R.id.partagerBtn);
+        searchInput = findViewById(R.id.searchInput);
         recetteDAO = new RecetteDAO(this);
         refreshList();
 
@@ -109,7 +114,37 @@ public class RecetteActivity extends AppCompatActivity {
             startActivity(intent);
             finish();  // Close this activity
         });
+
+        partagerBtn.setOnClickListener(v -> {
+            if (selectedIndex != -1) {
+                Recette selected = recettes.get(selectedIndex);
+                String shareText = "Recette : " + selected.getTitre() + "\n\n" + selected.getDescription();
+
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("text/plain");
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Recette à partager");
+                shareIntent.putExtra(Intent.EXTRA_TEXT, shareText);
+                startActivity(Intent.createChooser(shareIntent, "Partager via"));
+            } else {
+                Toast.makeText(this, "Sélectionnez une recette à partager", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        searchInput.addTextChangedListener(new android.text.TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filterRecettes(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(android.text.Editable s) {}
+        });
+
     }
+
 
     private void refreshList() {
         recettes = recetteDAO.getAllRecettes();
@@ -124,7 +159,7 @@ public class RecetteActivity extends AppCompatActivity {
             String description = r.getDescription();
 
             // Afficher la première ligne (avant le premier "\n")
-            String shortDescription = description.split("\n")[0] + "..."vm;
+            String shortDescription = description.split("\n")[0] + "...";
 
             // Si tu veux limiter à 20 caractères
             if (shortDescription.length() > 20) {
@@ -139,6 +174,26 @@ public class RecetteActivity extends AppCompatActivity {
             adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, data);
             recetteListView.setAdapter(adapter);
         }
+    }
+    private void filterRecettes(String query) {
+        ArrayList<String> filteredData = new ArrayList<>();
+        for (Recette r : recettes) {
+            if (r.getTitre().toLowerCase().contains(query.toLowerCase()) ||
+                    r.getDescription().toLowerCase().contains(query.toLowerCase())) {
+
+                String description = r.getDescription();
+                String shortDescription = description.split("\n")[0];
+
+                if (shortDescription.length() > 20) {
+                    shortDescription = shortDescription.substring(0, 20) + "...";
+                }
+
+                filteredData.add(r.getTitre() + "\n" + shortDescription);
+            }
+        }
+
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, filteredData);
+        recetteListView.setAdapter(adapter);
     }
 
 

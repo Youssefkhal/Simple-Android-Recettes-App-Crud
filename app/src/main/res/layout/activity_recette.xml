@@ -20,6 +20,16 @@
         android:textColor="@android:color/white" />
 
     <EditText
+        android:id="@+id/searchInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Rechercher une recette..."
+        android:inputType="text"
+        android:padding="8dp"
+        android:layout_marginBottom="10dp"/>
+
+
+    <EditText
         android:id="@+id/titreInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -68,4 +78,14 @@
         android:layout_weight="1"
         android:dividerHeight="10dp"
         android:layout_marginTop="16dp" />
+
+    <Button
+        android:id="@+id/partagerBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Partager"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="@android:color/holo_blue_light"
+        />
+
 </LinearLayout>
